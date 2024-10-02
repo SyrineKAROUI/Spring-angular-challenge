@@ -12,5 +12,23 @@ import javax.persistence.Entity;
 @DiscriminatorValue("CA")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class CurrentAccount extends BankAccount {
+    private static final double OVERDRAFT_LIMIT = 500.0; // Example overdraft limit
     private double overDraft;
+    @Override
+    public void debit(double amount,String description) {
+        // Allow overdraft
+        if (amount > getBalance() + OVERDRAFT_LIMIT) {
+            throw new IllegalArgumentException("Overdraft limit exceeded");
+        }
+        super.debit(amount, description);
+    }
+
+    @Override
+    public void credit(double amount, String description) {
+        // Allow overdraft
+        if (amount > getBalance() + OVERDRAFT_LIMIT) {
+            throw new IllegalArgumentException("Overdraft limit exceeded");
+        }
+        super.debit(amount,description);
+    }
 }

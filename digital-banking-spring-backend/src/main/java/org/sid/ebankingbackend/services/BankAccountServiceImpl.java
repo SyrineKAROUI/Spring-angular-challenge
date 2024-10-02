@@ -94,18 +94,41 @@ public class BankAccountServiceImpl implements BankAccountService {
     //TODO: IMPLEMENT THIS
     @Override
     public void debit(String accountId, double amount, String description) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        BankAccount bankAccount=bankAccountRepository.findById(accountId).orElse(null);
+        if(bankAccount==null) throw new BankAccountNotFoundException("Account not Found");
 
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Debit amount must be positive");
+        }
+        bankAccount.debit(amount, description);
+        bankAccountRepository.save(bankAccount);
     }
 
     //TODO: IMPLEMENT THIS
     @Override
     public void credit(String accountId, double amount, String description) throws BankAccountNotFoundException {
-
+        BankAccount bankAccount=bankAccountRepository.findById(accountId).orElse(null);
+        if(bankAccount==null) throw new BankAccountNotFoundException("Account not Found");
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Debit amount must be positive");
+        }
+        bankAccount.credit(amount, description);
+        bankAccountRepository.save(bankAccount);
     }
 
     //TODO: IMPLEMENT THIS
     @Override
-    public void transfer(String accountIdSource, String accountIdDestination, double amount) throws BankAccountNotFoundException, BalanceNotSufficientException {
+    public void transfer(String c, String accountIdDestination, double amount) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Transfer amount must be positive");
+        }
+        BankAccount bankAccountFrom=bankAccountRepository.findById(c).orElse(null);
+        BankAccount bankAccountTo=bankAccountRepository.findById(accountIdDestination).orElse(null);
+        if(bankAccountFrom==null) throw new BankAccountNotFoundException("Source Account not Found");
+
+        if(bankAccountTo==null) throw new BankAccountNotFoundException("Destination Account not Found");
+        bankAccountFrom.debit(amount,"Transfer from");
+        bankAccountTo.credit(amount,"transfer to");
 
     }
 
